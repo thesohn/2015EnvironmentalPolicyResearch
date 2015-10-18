@@ -4,7 +4,8 @@
 ###########################################################################################################
 #INTRODUCTION
 
-This is a reference for how to reformat pollution data found in: http://www.arb.ca.gov/aqmis2/aqdselect.php
+This is a reference for how to use R (programming language) to reformat pollution data found in: 
+http://www.arb.ca.gov/aqmis2/aqdselect.php
 
 ###########################################################################################################
 #HOW TO RETRIEVE POLLUTION DATA FROM ARB.CA.GOV (VERY STRAIGHT FORWARD)
