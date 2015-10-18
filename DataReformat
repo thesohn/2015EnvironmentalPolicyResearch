@@ -1,0 +1,118 @@
+#AUTHOR: ANTHONY SOHN
+#LAST UPDATE: 10/18/2015
+
+###########################################################################################################
+#INTRODUCTION
+
+This is a reference for how to reformat pollution data found in: http://www.arb.ca.gov/aqmis2/aqdselect.php
+
+###########################################################################################################
+#HOW TO RETRIEVE POLLUTION DATA FROM ARB.CA.GOV (VERY STRAIGHT FORWARD)
+
+You would choose a pollution dataset using a graphical user interface at http://www.arb.ca.gov/aqmis2/aqdselect.php 
+
+It will ask you to select: 
+1. pollution type = {ozone, sulfur dioxide, etc}, unit type = {ppm, etc}, statistic = {daily avg,max}
+2. end date
+3. location
+4. type of report (week-at-a-glance or year-at-a-glance)
+5. sort order (i dont know what this is)
+
+Then you would click "Retrive Data" and you will find a hypertext link at the bottom next to "Download Data"
+Options for downloading are: "Quick" and "Select Format" = {xls, csv, txt}
+
+I like to download it as a csv file.
+############################################################################################################
+#WHAT POLLUTION DATA CSV FILE LOOKS LIKE IN RSTUDIO
+
+Files for pollution data in this website (report type = "Year-at-a-Glance") are formatted like this:
+
+dom		mth1	mth2	..	mth12	
+1			2.3		5.2		..	4.3
+2			2.4		7.5		..	6.7
+..		..		..		..	2.3
+31		3.2		1.3		..	0.3
+..		..		..		..	..
+extra crap	extra crap	extra crap	NA	NA
+
+#note: dom = day of month, mth1 = january, mth2 = february, ..., mth12 = december (PRETTY STRAIGHT FORWARD)
+#############################################################################################################
+#WHY I MADE THIS REFORMATTER (GOAL)
+
+Since these files sometimes come with unnecessary information (i think they're unnecessary) at the bottom,
+I made this reformatter to translate a file to a single vector of size 365 [for 1 year of daily data]
+
+The goal for me was to get a vector for each type of desired pollution data (ozone, carbon dioxide, etc) from a specified 
+location (in my case: Sacramento) and combine them to one csv file so you have pollution type on columns, and day of year on rows.
+
+example:
+doy	ozone	sulfur_dioxide	..	carbon_dioxide
+1		3.2		1.2							..	2.1
+2		23.3	4.2							..	1.3
+..	..		..							..	1.5
+365 2.1		5.3							..	5.3
+
+###########################################################################################################
+#STEP 1: LOAD CSV FILE DATA TO RSTUDIO 
+sac_carbonMonoxide <- read.csv("C:/Users/Anthony/Downloads/sac_carbonMonoxide.csv", stringsAsFactors=FALSE)
+data = sac_carbonMonoxide
+###########################################################################################################
+#STEP 2: CHECK IF THE YEAR DATA IS "COMMON" OR "LEAP YEAR" (Required for setting up the reformatter)
+
+Personally, I just used google to check if my 2015 dataset is a leap year or not.
+Google said 2015 is not a leap year. 
+
+If you want to automate this process, you can code it based on the pseudo code below. 
+
+Pseudo code:
+
+if (year is not exactly divisible by 4) then (it is a common year)
+else
+if (year is not exactly divisible by 100) then (it is a leap year)
+else
+if (year is not exactly divisible by 400) then (it is a common year)
+else (it is a leap year)
+
+I found out that 2015 is a common year using Google. 
+
+common = c(31,28,31,30,31,30,31,31,30,31,30,31) #if data is from a common year, use this
+leap = c(31,29,31,30,31,30,31,31,30,31,30,31) #if data is from a leap year, use this
+###########################################################################################################
+#STEP 3: REFORMAT THE DATA WITH THE FOR LOOP
+#note: in this example, we used data 2015 which is a common year.
+
+daysOfMonth = common
+
+a = vector(mode = "numeric", length = 365)
+beginning = 1
+end = 31
+
+for (x in 1:12){
+	a[beginning:end] = as.numeric(data[[x+1]][1:daysOfMonth[x]])
+	beginning = end + 1
+	end = end + daysOfMonth[x+1]
+}
+###########################################################################################################
+#STEP 4: REPEAT UNTIL YOU HAVE ALL THE VECTORS YOU WANT
+###########################################################################################################
+#FINAL STEP:
+
+After you get numerous vectors of the same length, you can combine with cbind
+
+So, if you have vectors ozone,sulfer_dioxide,..,carbon_dioxide of same length you can:
+cbind(ozone,sulfer_dioxide,..,carbon_dioxide)
+
+it should look something like:
+
+	ozone	sulfur_dioxide	..	carbon_dioxide
+1	3.2	1.2		..	2.1
+2	23.3	4.2		..	1.3
+..	..	..		..	1.5
+365  	2.1	5.3		..	5.3
+
+With the final data, you can write it to a CSV file through R:
+write.csv(MyData, file = "MyData.csv")
+###########################################################################################################
+#REGARDS,
+#ANTHONY SOHN 10/18/2015
+########################################################################################################### 
