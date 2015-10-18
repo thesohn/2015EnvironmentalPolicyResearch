@@ -44,7 +44,7 @@ Since these files sometimes come with unnecessary information (i think they're u
 I made this reformatter to translate a file to a single vector of size 365 [for 1 year of daily data]
 
 The goal for me was to get a vector for each type of desired pollution data (ozone, carbon dioxide, etc) from a specified 
-location (in my case: Sacramento) and combine them to one csv file so you have pollution type on columns, and day of year on rows.
+location (in my case: Sacramento) and combine them to one csv file so "pollution type" is on columns, and day of year is on rows.
 
 example:
 doy	ozone	sulfur_dioxide	..	carbon_dioxide
@@ -58,31 +58,31 @@ doy	ozone	sulfur_dioxide	..	carbon_dioxide
 sac_carbonMonoxide <- read.csv("C:/Users/Anthony/Downloads/sac_carbonMonoxide.csv", stringsAsFactors=FALSE)
 data = sac_carbonMonoxide
 ###########################################################################################################
-#STEP 2: CHECK IF THE YEAR DATA IS "COMMON" OR "LEAP YEAR" (Required for setting up the reformatter)
+#STEP 2: CHECK IF THE YEAR OF DATA IS LEAP YEAR (Required for setting up the reformatter)
 
-Personally, I just used google to check if my 2015 dataset is a leap year or not.
-Google said 2015 is not a leap year. 
+Personally, I just used Google to check if my 2015 dataset is a leap year or not.
+By using Google, I found that 2015 is NOT a leap year. 
 
-If you want to automate this process, you can code it based on the pseudo code below. 
+If you want to automate this process, you can code it based on the simple pseudo code below. 
 
 #pseudo code:
 
 #if (year is not exactly divisible by 4) then (it is a common year)
-#else
+#else 
 #if (year is not exactly divisible by 100) then (it is a leap year)
 #else
 #if (year is not exactly divisible by 400) then (it is a common year)
 #else (it is a leap year)
 
-I found out that 2015 is a common year using Google. 
-
-common = c(31,28,31,30,31,30,31,31,30,31,30,31) #if data is from a common year, use this
-leap = c(31,29,31,30,31,30,31,31,30,31,30,31) #if data is from a leap year, use this
 ###########################################################################################################
-#STEP 3: REFORMAT THE DATA WITH THE FOR LOOP
-#note: in this example, we used data 2015 which is a common year.
+#STEP 3 (CODE): REFORMAT THE DATA WITH THE FOR LOOP
 
-daysOfMonth = common
+notLeapYear = c(31,28,31,30,31,30,31,31,30,31,30,31) #if not leap year.
+leapYear = c(31,29,31,30,31,30,31,31,30,31,30,31) #if leap year.
+
+#note: in this example, we used data from 2015 which is NOT a leap year.
+
+daysOfMonth = notLeapYear
 
 a = vector(mode = "numeric", length = 365)
 beginning = 1
